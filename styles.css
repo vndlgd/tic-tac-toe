@@ -1,0 +1,14 @@
+body {
+    display: grid;
+    justify-content: center;
+    align-items: center;
+}
+
+#title {
+    text-align: center;
+}
+
+#container {
+    font-weight: bold;
+    font-size: 8rem;
+}
