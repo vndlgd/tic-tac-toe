@@ -4,11 +4,37 @@ body {
     align-items: center;
 }
 
-#title {
+#container {
+    display: grid;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 2rem;
+}
+
+#title,
+.turn {
+    justify-content: center;
+    align-items: center;
     text-align: center;
 }
 
-#container {
-    font-weight: bold;
-    font-size: 8rem;
+.board {
+    display: grid;
+    height: 500px;
+    width: 500px;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 5px;
+    background-color: black;
+}
+
+.Cell {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    font-size: 4rem;
+    border: none;
+    background: white;
 }
