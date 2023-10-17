@@ -27,6 +27,14 @@ const gameBoard = (function () {
         return true;
     };
 
+    const clearBoard = () => {
+        for (let i = 0; i < rows; i++) {
+            for (let j = 0; j < cols; j++) {
+                gameboard[i][j].removeValue();
+            }
+        }
+    }
+
     // will be deleted after we tie it to the DOM
     const printBoard = () => {
         // finish this function 
@@ -34,7 +42,9 @@ const gameBoard = (function () {
         console.log(boardWithCellValues);
     };
 
+
     return {
+        clearBoard,
         getBoard,
         printBoard,
         addMark
@@ -53,8 +63,12 @@ function Cell() {
     // retrieve current cell value
     const getValue = () => value;
 
+    const removeValue = () => {
+        value = "";
+    }
+
     return {
-        getValue, addSymbol
+        getValue, addSymbol, removeValue
     };
 }
 
@@ -62,8 +76,6 @@ function Cell() {
 function gameController(playerOneName = "Player One", playerTwoName = "Player Two") {
     // implement this then displayController after
     const board = gameBoard;
-
-    let moves = 0; // to help determine draw
 
     const players = [
         {
@@ -95,12 +107,12 @@ function gameController(playerOneName = "Player One", playerTwoName = "Player Tw
 
     // check for tie
     const draw = () => {
-        // code here
-        moves = moves + 1;
-        if (moves === 9) {
-            return true;
+        const boardWithCellValues = board.getBoard().map((row) => row.map((cell) => cell.getValue()))
+        // if any row contains "" then board is not filled yet, return false
+        if (boardWithCellValues[0].includes("") || boardWithCellValues[1].includes("") || boardWithCellValues[2].includes("")) {
+            return false;
         }
-        return false;
+        return true;
     }
 
     const playRound = (row, column) => {
@@ -170,9 +182,11 @@ function gameController(playerOneName = "Player One", playerTwoName = "Player Tw
 
 // displayController module responsible for management of the DOM
 function displayController() {
+    const restartBoard = gameBoard; // to call the clearBoard function, could use a better variable name
     const game = gameController();
     const boardDiv = document.querySelector(".board");
     const playerTurn = document.querySelector(".turn");
+    const restart = document.querySelector("#restart");
 
     const updateScreen = () => {
 
@@ -212,11 +226,33 @@ function displayController() {
         if (play === true) {
             playerTurn.textContent = `${game.getActivePlayer().symbol} WINS`
             boardDiv.removeEventListener("click", clickHandlerBoard);
-        } else if (game.draw()) {
+            document.getElementById("restart").style.display = "block";
+        } else if (game.draw() === true) {
             playerTurn.textContent = "It's a draw!";
             boardDiv.removeEventListener("click", clickHandlerBoard);
+            document.getElementById("restart").style.display = "block";
         }
     }
+
+    function clearBoard(e) {
+        const board = game.getBoard();
+        const activePlayer = game.getActivePlayer();
+
+        // clear board appearance 
+        for (let i = 0; i < board.length; i++) {
+            for (let j = 0; j < board[0].length; j++) {
+                const cellButton = document.querySelector(".Cell");
+                cellButton.textContent = "";
+                boardDiv.appendChild(cellButton)
+            }
+        }
+        restartBoard.clearBoard(); // clear board array values 
+        document.getElementById("restart").style.display = "none";
+        playerTurn.textContent = `${activePlayer.symbol}'s turn`;
+        boardDiv.addEventListener("click", clickHandlerBoard) // allow clicking on board again after restart
+    }
+
+    restart.addEventListener("click", clearBoard);
 
     boardDiv.addEventListener("click", clickHandlerBoard);
 

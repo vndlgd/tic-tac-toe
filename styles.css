@@ -2,6 +2,7 @@ body {
     display: grid;
     justify-content: center;
     align-items: center;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
 #container {
@@ -37,4 +38,24 @@ body {
     font-size: 4rem;
     border: none;
     background: white;
+}
+
+#restart {
+    display: none;
+    width: 200px;
+    height: 50px;
+    font-weight: bold;
+    font-size: 2rem;
+    border: 5px solid gray;
+    color: gray;
+    border-radius: 15px;
+    margin-top: 30px;
+    align-self: center;
+    justify-self: center;
+    transition: 0.5s;
+}
+
+#restart:hover {
+    border: 5px solid orange;
+    color: black;
 }
