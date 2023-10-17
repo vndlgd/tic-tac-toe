@@ -19,11 +19,12 @@ const gameBoard = (function () {
         // check if spot taken on the gameboard
         if (gameboard[row][column].getValue() !== "") {
             console.log("You can't mark here, it's taken.")
-            return;
+            return false;
         }
 
         // otherwise, I have a valid empty cell
         gameboard[row][column].addSymbol(player);
+        return true;
     };
 
     // will be deleted after we tie it to the DOM
@@ -62,6 +63,8 @@ function gameController(playerOneName = "Player One", playerTwoName = "Player Tw
     // implement this then displayController after
     const board = gameBoard;
 
+    let moves = 0; // to help determine draw
+
     const players = [
         {
             name: playerOneName,
@@ -90,12 +93,70 @@ function gameController(playerOneName = "Player One", playerTwoName = "Player Tw
         console.log(`${activePlayer.symbol}'s turn`)
     }
 
-    const playRound = (row, column) => {
-        console.log(`Marking ${getActivePlayer().symbol} on row ${row} column ${column}`)
+    // check for tie
+    const draw = () => {
+        // code here
+        moves = moves + 1;
+        if (moves === 9) {
+            return true;
+        }
+        return false;
+    }
 
-        board.addMark(row, column, getActivePlayer().symbol);
+    const playRound = (row, column) => {
+        // console.log(`Marking ${getActivePlayer().symbol} on row ${row} column ${column}`)
+        const valid = board.addMark(row, column, getActivePlayer().symbol);
+
+        // if not valid, do not switch players and print new round
+        if (!valid) {
+            return;
+        }
 
         // check for winner and handle logic, such as a win message
+        // check for row win
+        function checkRow() {
+            for (let i = 0; i < board.getBoard().length; i++) {
+                if (board.getBoard()[i][0].getValue() === getActivePlayer().symbol && board.getBoard()[i][1].getValue() === getActivePlayer().symbol && board.getBoard()[i][2].getValue() === getActivePlayer().symbol) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // check for column win
+        function checkCol() {
+            let currentCol = 0;
+            let currentRow = 0;
+            while (currentCol !== 3) {
+                if (board.getBoard()[currentRow][currentCol].getValue() === getActivePlayer().symbol) {
+                    currentRow++;
+                    if (currentRow === 3) {
+                        return true;
+                    }
+                }
+                else {
+                    currentRow = 0;
+                    currentCol++;
+                }
+            }
+            return false;
+        }
+
+        // check for diagonal win 
+        function checkDiagonal() {
+            if (board.getBoard()[1][1].getValue() === getActivePlayer().symbol) {
+                if (board.getBoard()[0][0].getValue() === getActivePlayer().symbol && board.getBoard()[2][2].getValue() === getActivePlayer().symbol) {
+                    return true;
+                } else if (board.getBoard()[0][2].getValue() === getActivePlayer().symbol && board.getBoard()[2][0].getValue() === getActivePlayer().symbol) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        if (checkRow() || checkCol() || checkDiagonal()) {
+            return true;
+        }
 
         switchPlayerTurn();
         printNewRound();
@@ -104,7 +165,7 @@ function gameController(playerOneName = "Player One", playerTwoName = "Player Tw
     // Initial play game message
     printNewRound();
 
-    return { getBoard: board.getBoard, playRound, getActivePlayer };
+    return { getBoard: board.getBoard, playRound, getActivePlayer, draw };
 }
 
 // displayController module responsible for management of the DOM
@@ -122,7 +183,7 @@ function displayController() {
         const activePlayer = game.getActivePlayer();
 
         // display player's turn
-        playerTurn.textContent = `${activePlayer.symbol}'s turn!`;
+        playerTurn.textContent = `${activePlayer.symbol}'s turn`;
 
         // render board rows
         for (let i = 0; i < board.length; i++) {
@@ -145,13 +206,24 @@ function displayController() {
             return;
         }
         // if valid, play round
-        game.playRound(selectedRow, selectedColumn);
+        let play = game.playRound(selectedRow, selectedColumn);
         updateScreen();
+
+        if (play === true) {
+            playerTurn.textContent = `${game.getActivePlayer().symbol} WINS`
+            boardDiv.removeEventListener("click", clickHandlerBoard);
+        } else if (game.draw()) {
+            playerTurn.textContent = "It's a draw!";
+            boardDiv.removeEventListener("click", clickHandlerBoard);
+        }
     }
+
     boardDiv.addEventListener("click", clickHandlerBoard);
 
     // initial render
     updateScreen();
+
+    return { playerTurn };
 }
 
 displayController();
