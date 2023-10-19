@@ -73,17 +73,39 @@ function Cell() {
 }
 
 // gameController module will be responsible for controlling the flow and state of the game 
-function gameController(playerOneName = "Player One", playerTwoName = "Player Two") {
+function gameController() {
     // implement this then displayController after
     const board = gameBoard;
 
+    const form = document.getElementById("playButton");
+    const container = document.getElementById("container");
+    const introScreen = document.getElementById("intro-screen");
+
+    form.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        players[0].name = document.getElementById("player1").value;
+        players[1].name = document.getElementById("player2").value;
+
+        console.log(players[0].name)
+        console.log(players[1].name)
+
+        display.updateScreen();
+
+        introScreen.style.display = "none";
+        container.style.display = "grid";
+    })
+
+    // TODO:
+    // Add player's names from the form here
+    // use that to display the names on the playerTurn div
     const players = [
         {
-            name: playerOneName,
+            name: "",
             symbol: "X"
         },
         {
-            name: playerTwoName,
+            name: "",
             symbol: "O"
         }
     ];
@@ -102,7 +124,7 @@ function gameController(playerOneName = "Player One", playerTwoName = "Player Tw
 
     const printNewRound = () => {
         board.printBoard();
-        console.log(`${activePlayer.symbol}'s turn`)
+        console.log(`${activePlayer.name}'s turn`)
     }
 
     // check for tie
@@ -197,7 +219,7 @@ function displayController() {
         const activePlayer = game.getActivePlayer();
 
         // display player's turn
-        playerTurn.textContent = `${activePlayer.symbol}'s turn`;
+        playerTurn.textContent = `${activePlayer.name}'s turn`;
 
         // render board rows
         for (let i = 0; i < board.length; i++) {
@@ -224,7 +246,7 @@ function displayController() {
         updateScreen();
 
         if (play === true) {
-            playerTurn.textContent = `${game.getActivePlayer().symbol} WINS`
+            playerTurn.textContent = `${game.getActivePlayer().name} wins!`
             boardDiv.removeEventListener("click", clickHandlerBoard);
             document.getElementById("restart").style.display = "block";
         } else if (game.draw() === true) {
@@ -248,7 +270,7 @@ function displayController() {
         }
         restartBoard.clearBoard(); // clear board array values 
         document.getElementById("restart").style.display = "none";
-        playerTurn.textContent = `${activePlayer.symbol}'s turn`;
+        playerTurn.textContent = `${activePlayer.name}'s turn`;
         boardDiv.addEventListener("click", clickHandlerBoard) // allow clicking on board again after restart
     }
 
@@ -259,7 +281,7 @@ function displayController() {
     // initial render
     updateScreen();
 
-    return { playerTurn };
+    return { playerTurn, updateScreen };
 }
 
-displayController();
+const display = displayController();
