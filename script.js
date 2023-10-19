@@ -256,7 +256,7 @@ function displayController() {
                 // assign cellButton's corresponding class to handle CSS coloring
                 if (cellButton.textContent === "X") {
                     cellButton.classList.add("X");
-                } else {
+                } else if (cellButton.textContent === "O") {
                     cellButton.classList.add("O");
                 }
                 boardDiv.appendChild(cellButton)
@@ -267,6 +267,7 @@ function displayController() {
     function clickHandlerBoard(e) {
         const selectedRow = e.target.dataset.row;
         const selectedColumn = e.target.dataset.column;
+
         if (!selectedRow || !selectedColumn) {
             return;
         }
