@@ -87,10 +87,11 @@ function gameController() {
         players[0].name = document.getElementById("player1").value;
         players[1].name = document.getElementById("player2").value;
 
-        console.log(players[0].name)
-        console.log(players[1].name)
+        console.log(activePlayer.name)
+        activePlayer = players[0];
 
         display.updateScreen();
+        display.clearBoard();
 
         introScreen.style.display = "none";
         container.style.display = "grid";
@@ -127,6 +128,12 @@ function gameController() {
         console.log(`${activePlayer.name}'s turn`)
     }
 
+    function restartGame() {
+        console.log("please work")
+        activePlayer = players[0];
+        return activePlayer;
+    }
+
     // check for tie
     const draw = () => {
         const boardWithCellValues = board.getBoard().map((row) => row.map((cell) => cell.getValue()))
@@ -138,6 +145,7 @@ function gameController() {
     }
 
     const playRound = (row, column) => {
+
         // console.log(`Marking ${getActivePlayer().symbol} on row ${row} column ${column}`)
         const valid = board.addMark(row, column, getActivePlayer().symbol);
 
@@ -189,6 +197,9 @@ function gameController() {
         }
 
         if (checkRow() || checkCol() || checkDiagonal()) {
+            // always start with X
+            if (activePlayer === players[1]) {
+            }
             return true;
         }
 
@@ -199,7 +210,7 @@ function gameController() {
     // Initial play game message
     printNewRound();
 
-    return { getBoard: board.getBoard, playRound, getActivePlayer, draw };
+    return { getBoard: board.getBoard, playRound, getActivePlayer, draw, restartGame };
 }
 
 // displayController module responsible for management of the DOM
@@ -209,6 +220,10 @@ function displayController() {
     const boardDiv = document.querySelector(".board");
     const playerTurn = document.querySelector(".turn");
     const restart = document.querySelector("#restart");
+    const backButton = document.querySelector("#back");
+
+    const container = document.getElementById("container");
+    const introScreen = document.getElementById("intro-screen");
 
     const updateScreen = () => {
 
@@ -221,6 +236,13 @@ function displayController() {
         // display player's turn
         playerTurn.textContent = `${activePlayer.name}'s turn`;
 
+        // Change color of playerTurn div according to player color
+        if (activePlayer.symbol === "X") {
+            playerTurn.style.color = "var(--player-1-color)";
+        } else if (activePlayer.symbol = "O") {
+            playerTurn.style.color = "var(--player-2-color)";
+        }
+
         // render board rows
         for (let i = 0; i < board.length; i++) {
             for (let j = 0; j < board[0].length; j++) {
@@ -230,6 +252,13 @@ function displayController() {
                 cellButton.dataset.row = i;
                 cellButton.dataset.column = j;
                 cellButton.textContent = board[i][j].getValue();
+
+                // assign cellButton's corresponding class to handle CSS coloring
+                if (cellButton.textContent === "X") {
+                    cellButton.classList.add("X");
+                } else {
+                    cellButton.classList.add("O");
+                }
                 boardDiv.appendChild(cellButton)
             }
         }
@@ -241,15 +270,18 @@ function displayController() {
         if (!selectedRow || !selectedColumn) {
             return;
         }
+
         // if valid, play round
         let play = game.playRound(selectedRow, selectedColumn);
         updateScreen();
 
         if (play === true) {
+            playerTurn.style.color = "var(--main-color)";
             playerTurn.textContent = `${game.getActivePlayer().name} wins!`
             boardDiv.removeEventListener("click", clickHandlerBoard);
             document.getElementById("restart").style.display = "block";
         } else if (game.draw() === true) {
+            playerTurn.style.color = "var(--main-color)";
             playerTurn.textContent = "It's a draw!";
             boardDiv.removeEventListener("click", clickHandlerBoard);
             document.getElementById("restart").style.display = "block";
@@ -268,20 +300,33 @@ function displayController() {
                 boardDiv.appendChild(cellButton)
             }
         }
+        const resetPlayerTurn = game.restartGame();
         restartBoard.clearBoard(); // clear board array values 
         document.getElementById("restart").style.display = "none";
-        playerTurn.textContent = `${activePlayer.name}'s turn`;
+        console.log(activePlayer.name)
+        playerTurn.textContent = `${resetPlayerTurn.name}'s turn`;
+
+        if (resetPlayerTurn.symbol === "X") {
+            playerTurn.style.color = "var(--player-1-color)";
+        } else {
+            playerTurn.style.color = "var(--player-2-color)";
+        }
         boardDiv.addEventListener("click", clickHandlerBoard) // allow clicking on board again after restart
     }
 
-    restart.addEventListener("click", clearBoard);
+    function goBack(e) {
+        container.style.display = "none";
+        introScreen.style.display = "grid";
+    }
 
+    restart.addEventListener("click", clearBoard);
+    backButton.addEventListener("click", goBack)
     boardDiv.addEventListener("click", clickHandlerBoard);
 
     // initial render
     updateScreen();
 
-    return { playerTurn, updateScreen };
+    return { playerTurn, updateScreen, clearBoard };
 }
 
 const display = displayController();
