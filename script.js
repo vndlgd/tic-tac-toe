@@ -35,9 +35,7 @@ const gameBoard = (function () {
         }
     }
 
-    // will be deleted after we tie it to the DOM
     const printBoard = () => {
-        // finish this function 
         const boardWithCellValues = gameboard.map((row) => row.map((cell) => cell.getValue()))
         console.log(boardWithCellValues);
     };
@@ -74,7 +72,6 @@ function Cell() {
 
 // gameController module will be responsible for controlling the flow and state of the game 
 function gameController() {
-    // implement this then displayController after
     const board = gameBoard;
 
     const form = document.getElementById("playButton");
@@ -97,9 +94,6 @@ function gameController() {
         container.style.display = "grid";
     })
 
-    // TODO:
-    // Add player's names from the form here
-    // use that to display the names on the playerTurn div
     const players = [
         {
             name: "",
@@ -137,7 +131,7 @@ function gameController() {
     // check for tie
     const draw = () => {
         const boardWithCellValues = board.getBoard().map((row) => row.map((cell) => cell.getValue()))
-        // if any row contains "" then board is not filled yet, return false
+        // if any row contains "", then board is not filled yet, return false
         if (boardWithCellValues[0].includes("") || boardWithCellValues[1].includes("") || boardWithCellValues[2].includes("")) {
             return false;
         }
@@ -149,12 +143,11 @@ function gameController() {
         // console.log(`Marking ${getActivePlayer().symbol} on row ${row} column ${column}`)
         const valid = board.addMark(row, column, getActivePlayer().symbol);
 
-        // if not valid, do not switch players and print new round
+        // if not valid, then do not switch players and print new round
         if (!valid) {
             return;
         }
 
-        // check for winner and handle logic, such as a win message
         // check for row win
         function checkRow() {
             for (let i = 0; i < board.getBoard().length; i++) {
