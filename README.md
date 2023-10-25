@@ -2,6 +2,8 @@
 
 This [Tic-Tac-Toe](https://vndlgd.github.io/tic-tac-toe/) project is a web-based game developed as part of The Odin Project's JavaScript course. It serves as a practical application to demonstrate the use of factory functions and modules, emphasizing encapsulation to create a more secure and organized code structure.
 
+https://github.com/vndlgd/tic-tac-toe/assets/46804151/8fdd5486-3492-4d26-9488-e835a5ea8349
+
 ## Features
 
 - **Player Selection:** Players can choose 'X' or 'O' to represent themselves.
